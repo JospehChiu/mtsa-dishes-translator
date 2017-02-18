@@ -10,12 +10,12 @@ app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = 'very-very-super-secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///aafood.db'
 
-app.config['CELERY_BROKER_URL']='redis://localhost:6379/0'
-app.config['CELERY_RESULT_BACKEND']='redis://localhost:6379/0'
+app.config['CELERY_BROKER_URL']='redis://localhost:6379/14'
+app.config['CELERY_RESULT_BACKEND']='redis://localhost:6379/14'
 celery = make_celery(app)
 
 from flask_redis import FlaskRedis
-app.config['REDIS_URL'] = 'redis://localhost:6379/1'
+app.config['REDIS_URL'] = 'redis://localhost:6379/15'
 redis_store = FlaskRedis(app)
 
 
@@ -63,9 +63,11 @@ def messenge_updates():
                 if 'sender' in msg and 'message' in msg:
                     sender = msg['sender']['id']
                     msgbody = msg['message']
+                    print("%s send a message: %s" %(sender, msgbody))
                     # 這邊使用 Async Task:
                     #   先送到 Redis 去存起來, 然後交給 celery 完成任務
-                    celery_handle_message.delay(msg, sender, msgbody)
+                    #celery_handle_message.delay(msg, sender, msgbody)
+                    celery_handle_message(msg,sender,msgbody)
 
     return "OK"
     
